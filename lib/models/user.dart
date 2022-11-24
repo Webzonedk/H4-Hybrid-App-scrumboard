@@ -3,7 +3,7 @@ class User {
   String id;
   final String name;
   final int age;
-  final DateTime birthDate;
+  final DateTime? birthDate;
 
   User({
     this.id = '',

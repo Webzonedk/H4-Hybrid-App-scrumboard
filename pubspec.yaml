@@ -47,6 +47,16 @@ dependencies:
   #Firebase Auth integration
   firebase_auth:
 
+  #To be able to pick dates
+  date_field:
+
+  path_provider:
+  path:
+  box:
+  boardview:
+
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,2 +1,3 @@
 export 'user.dart';
-export 'card.dart';
+export 'board_item.dart';
+export 'board_list.dart';
