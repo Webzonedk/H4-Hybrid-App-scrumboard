@@ -26,6 +26,20 @@ class MainPage extends StatelessWidget {
       title: 'Scrumboard',
       theme: ThemeData(
         primarySwatch: Colors.purple,
+        inputDecorationTheme: const InputDecorationTheme(
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              width: 1,
+              color: Color.fromARGB(255, 142, 5, 194),
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              width: 2,
+              color: Color.fromARGB(255, 142, 5, 194),
+            ),
+          ),
+        ),
       ),
       home: const Home(),
     );
@@ -38,8 +52,9 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: const Text('Scrumboard'),
-          backgroundColor: Colors.purple[800],
+          backgroundColor: Color.fromARGB(255, 142, 5, 194),
         ),
+        backgroundColor: Color.fromARGB(255, 0, 0, 0),
         drawer: const NavigationDrawer(),
       );
 }
@@ -63,7 +78,7 @@ class NavigationDrawer extends StatelessWidget {
           top: MediaQuery.of(context).padding.top,
         ),
         decoration: const BoxDecoration(
-          color: Colors.purple,
+          color: Color.fromARGB(255, 142, 5, 194),
         ),
         height: 100,
         alignment: Alignment.bottomLeft,
@@ -72,7 +87,7 @@ class NavigationDrawer extends StatelessWidget {
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Color.fromARGB(255, 255, 255, 255),
           ),
         ),
       );

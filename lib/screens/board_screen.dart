@@ -1,6 +1,4 @@
 import 'package:boardview/boardview_controller.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 import 'package:date_field/date_field.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -22,7 +20,12 @@ class BoardScreen extends StatelessWidget {
 
   static List<BoardItemObject> getCards() {
     const data = [
-      {"title": "test"}
+      {"title": "test 1"},
+      {"title": "test 2"},
+      {"title": "test 3"},
+      {"title": "test 4"},
+      {"title": "test 5"},
+      {"title": "test 6"},
     ];
     return data.map<BoardItemObject>(BoardItemObject.fromJson).toList();
   }
@@ -33,7 +36,7 @@ class BoardScreen extends StatelessWidget {
   ];
 
   //Can be used to animate to different sections of the BoardView
-  BoardViewController boardViewController = new BoardViewController();
+  BoardViewController boardViewController = BoardViewController();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -41,7 +44,31 @@ class BoardScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Board'),
         ),
-        body: boarding(context),
+        backgroundColor: Colors.black87,
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              // Where the linear gradient begins and ends
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              // Add one stop for each color. Stops should increase from 0 to 1
+              stops: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+              colors: [
+                // Colors are easy thanks to Flutter's Colors class.
+                Color.fromARGB(175, 82, 5, 123),
+                Color.fromARGB(175, 88, 19, 185),
+                Color.fromARGB(175, 127, 49, 236),
+                Color.fromARGB(175, 89, 35, 251),
+                Color.fromARGB(175, 25, 32, 242),
+                Color.fromARGB(175, 89, 35, 251),
+                Color.fromARGB(175, 127, 49, 236),
+                Color.fromARGB(175, 88, 19, 185),
+                Color.fromARGB(175, 82, 5, 123),
+              ],
+            ),
+          ),
+          child: boarding(context),
+        ),
       );
 
   Widget boarding(BuildContext context) {
@@ -62,24 +89,24 @@ class BoardScreen extends StatelessWidget {
         onDropItem: (int? listIndex, int? itemIndex, int? oldListIndex,
             int? oldItemIndex, BoardItemState? state) {
           //Used to update our local item data
-          var item = _listData[oldListIndex!].items![oldItemIndex!];
-          _listData[oldListIndex].items!.removeAt(oldItemIndex!);
-          _listData[listIndex!].items!.insert(itemIndex!, item);
+          var item = _listData[oldListIndex!].items[oldItemIndex!];
+          _listData[oldListIndex].items.removeAt(oldItemIndex);
+          _listData[listIndex!].items.insert(itemIndex!, item);
         },
         onTapItem:
             (int? listIndex, int? itemIndex, BoardItemState? state) async {},
         item: Card(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(itemObject.title!),
+            child: Text(itemObject.title),
           ),
         ));
   }
 
   Widget _createBoardList(BoardListObject list) {
     List<BoardItem> items = [];
-    for (int i = 0; i < list.items!.length; i++) {
-      items.insert(i, buildBoardItem(list.items![i]) as BoardItem);
+    for (int i = 0; i < list.items.length; i++) {
+      items.insert(i, buildBoardItem(list.items[i]) as BoardItem);
     }
 
     return BoardList(
@@ -88,18 +115,22 @@ class BoardScreen extends StatelessWidget {
       onDropList: (int? listIndex, int? oldListIndex) {
         //Update our local list data
         var list = _listData[oldListIndex!];
-        _listData.removeAt(oldListIndex!);
+        _listData.removeAt(oldListIndex);
         _listData.insert(listIndex!, list);
       },
-      headerBackgroundColor: Color.fromARGB(255, 235, 236, 240),
-      backgroundColor: Color.fromARGB(255, 235, 236, 240),
+      headerBackgroundColor: const Color.fromARGB(255, 34, 40, 49),
+      backgroundColor: const Color.fromARGB(255, 34, 40, 49),
       header: [
         Expanded(
             child: Padding(
-                padding: EdgeInsets.all(5),
+                padding: const EdgeInsets.all(5),
                 child: Text(
-                  list.title!,
-                  style: TextStyle(fontSize: 20),
+                  list.title,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 255, 255, 255),
+                  ),
                 ))),
       ],
       items: items,

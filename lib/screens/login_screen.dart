@@ -21,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           //title: TextField(controller: controller),
           title: const Text('Login'),
+
           actions: [
             IconButton(
               icon: const Icon(Icons.add),
@@ -30,6 +31,30 @@ class _LoginPageState extends State<LoginPage> {
               },
             ),
           ],
+        ),
+        backgroundColor: Colors.black87,
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              // Where the linear gradient begins and ends
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              // Add one stop for each color. Stops should increase from 0 to 1
+              stops: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+              colors: [
+                // Colors are easy thanks to Flutter's Colors class.
+                Color.fromARGB(175, 82, 5, 123),
+                Color.fromARGB(175, 88, 19, 185),
+                Color.fromARGB(175, 127, 49, 236),
+                Color.fromARGB(175, 89, 35, 251),
+                Color.fromARGB(175, 25, 32, 242),
+                Color.fromARGB(175, 89, 35, 251),
+                Color.fromARGB(175, 127, 49, 236),
+                Color.fromARGB(175, 88, 19, 185),
+                Color.fromARGB(175, 82, 5, 123),
+              ],
+            ),
+          ),
         ),
       );
 
