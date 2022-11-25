@@ -43,7 +43,7 @@ class BoardScreen extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         drawer: const NavigationDrawer(),
         appBar: AppBar(
-          title: const Text('Board'),
+          title: const Text('Scrumboard'),
         ),
         backgroundColor: Colors.black87,
         body: Container(
@@ -83,32 +83,6 @@ class BoardScreen extends StatelessWidget {
     );
   }
 
-  Widget buildBoardItem(BoardItemObject itemObject) {
-    return BoardItem(
-        onStartDragItem:
-            (int? listIndex, int? itemIndex, BoardItemState? state) {},
-        onDropItem: (int? listIndex, int? itemIndex, int? oldListIndex,
-            int? oldItemIndex, BoardItemState? state) {
-          //Used to update our local item data
-          var item = _listData[oldListIndex!].items[oldItemIndex!];
-          _listData[oldListIndex].items.removeAt(oldItemIndex);
-          _listData[listIndex!].items.insert(itemIndex!, item);
-        },
-        onTapItem:
-            (int? listIndex, int? itemIndex, BoardItemState? state) async {},
-        item: Card(
-          color: const Color.fromARGB(255, 142, 5, 194),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-                style: const TextStyle(
-                  color: Color.fromARGB(255, 255, 255, 255),
-                ),
-                itemObject.title),
-          ),
-        ));
-  }
-
   Widget _createBoardList(BoardListObject list) {
     List<BoardItem> items = [];
     for (int i = 0; i < list.items.length; i++) {
@@ -141,5 +115,31 @@ class BoardScreen extends StatelessWidget {
       ],
       items: items,
     );
+  }
+
+  Widget buildBoardItem(BoardItemObject itemObject) {
+    return BoardItem(
+        onStartDragItem:
+            (int? listIndex, int? itemIndex, BoardItemState? state) {},
+        onDropItem: (int? listIndex, int? itemIndex, int? oldListIndex,
+            int? oldItemIndex, BoardItemState? state) {
+          //Used to update our local item data
+          var item = _listData[oldListIndex!].items[oldItemIndex!];
+          _listData[oldListIndex].items.removeAt(oldItemIndex);
+          _listData[listIndex!].items.insert(itemIndex!, item);
+        },
+        onTapItem:
+            (int? listIndex, int? itemIndex, BoardItemState? state) async {},
+        item: Card(
+          color: const Color.fromARGB(255, 142, 5, 194),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+                style: const TextStyle(
+                  color: Color.fromARGB(255, 255, 255, 255),
+                ),
+                itemObject.title),
+          ),
+        ));
   }
 }
