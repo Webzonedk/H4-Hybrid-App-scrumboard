@@ -4,8 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'models/models.dart';
 import 'screens/screens.dart';
+import 'widgets/widgets.dart';
 import 'package:date_field/date_field.dart';
-import 'package:flutter/src/rendering/box.dart';
 
 Future main() async {
   //Remember future if included methods needs to be run first
@@ -52,80 +52,9 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: const Text('Scrumboard'),
-          backgroundColor: Color.fromARGB(255, 142, 5, 194),
+          backgroundColor: const Color.fromARGB(255, 142, 5, 194),
         ),
-        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
         drawer: const NavigationDrawer(),
-      );
-}
-
-class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) => Drawer(
-        backgroundColor: const Color.fromARGB(255, 34, 40, 49),
-        child: SingleChildScrollView(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            buildHeader(context),
-            buildMenuItems(context),
-          ],
-        )),
-      );
-
-  Widget buildHeader(BuildContext context) => Container(
-        padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top,
-        ),
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 142, 5, 194),
-        ),
-        height: 100,
-        alignment: Alignment.bottomLeft,
-        child: const Text(
-          'Welcome',
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 255, 255, 255),
-          ),
-        ),
-      );
-
-  Widget buildMenuItems(BuildContext context) => Wrap(
-        runSpacing: 5,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.border_all_rounded),
-            textColor: const Color.fromARGB(255, 255, 255, 255),
-            iconColor: const Color.fromARGB(255, 142, 5, 194),
-            title: const Text('Board'),
-            onTap: () =>
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => BoardScreen(),
-            )),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person_add_alt),
-            textColor: const Color.fromARGB(255, 255, 255, 255),
-            iconColor: const Color.fromARGB(255, 142, 5, 194),
-            title: const Text('Add user'),
-            onTap: () =>
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => const UserPage(),
-            )),
-          ),
-          ListTile(
-            leading: const Icon(Icons.login),
-            textColor: const Color.fromARGB(255, 255, 255, 255),
-            iconColor: const Color.fromARGB(255, 142, 5, 194),
-            title: const Text('Login'),
-            onTap: () =>
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => const LoginPage(),
-            )),
-          ),
-        ],
       );
 }

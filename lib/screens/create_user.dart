@@ -8,15 +8,16 @@ import '../main.dart';
 import '../models/models.dart';
 import 'screens.dart';
 import 'package:flutter/src/rendering/box.dart';
+import '../widgets/widgets.dart';
 
-class UserPage extends StatefulWidget {
-  const UserPage({super.key});
+class CreateUserSreen extends StatefulWidget {
+  const CreateUserSreen({super.key});
 
   @override
-  State<UserPage> createState() => _UserPageState();
+  State<CreateUserSreen> createState() => _CreateUserSreenState();
 }
 
-class _UserPageState extends State<UserPage> {
+class _CreateUserSreenState extends State<CreateUserSreen> {
   DateTime? selectedDate;
   final controllerName = TextEditingController();
   final controllerAge = TextEditingController();

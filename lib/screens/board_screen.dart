@@ -14,6 +14,7 @@ import 'package:boardview/board_item.dart';
 import 'package:boardview/board_list.dart';
 import 'package:boardview/boardview_controller.dart';
 import 'package:boardview/boardview.dart';
+import '../widgets/widgets.dart';
 
 class BoardScreen extends StatelessWidget {
   BoardScreen({super.key});

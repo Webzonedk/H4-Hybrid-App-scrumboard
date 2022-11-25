@@ -1,3 +1,5 @@
+import 'package:box/firestore.dart';
+import 'package:date_field/date_field.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,30 +7,30 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../main.dart';
 import '../models/models.dart';
+import 'screens.dart';
+import 'package:flutter/src/rendering/box.dart';
 import '../widgets/widgets.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class GetUsersScreen extends StatelessWidget {
+  const GetUsersScreen({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final controller = TextEditingController();
   @override
   Widget build(BuildContext context) => Scaffold(
         drawer: const NavigationDrawer(),
         appBar: AppBar(
           //title: TextField(controller: controller),
-          title: const Text('Login'),
+          title: const Text('Get all users'),
 
           actions: [
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
-                final name = controller.text;
-                createUser(name: name);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => const CreateUserSreen(),
+                  ),
+                );
+                //readUsers(name: name);
               },
             ),
           ],
@@ -56,27 +58,37 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
+          //Streambuilder to read from database
+          child: StreamBuilder<List<User>>(
+              stream: readUsers(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Something went wrong! ${snapshot.error}');
+                } else if (snapshot.hasData) {
+                  final users = snapshot.data!;
+
+                  return ListView(
+                    children: users.map(buildUser).toList(),
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              }),
         ),
       );
 
-  Future createUser({required String name}) async {
-    // reference to firebase document
-    final docUser = FirebaseFirestore.instance.collection('users').doc();
+  Widget buildUser(User user) => ListTile(
+        textColor: const Color.fromARGB(255, 255, 255, 255),
+        leading: CircleAvatar(
+          child: Text('${user.age}'),
+        ),
+        title: Text(user.name),
+        subtitle: Text(user.birthDate!.toIso8601String()),
+      );
 
-    final user = User(
-      id: docUser.id,
-      name: name,
-      age: 21,
-      birthDate: DateTime(2000, 9, 14),
-    );
-    final json = user.toJson();
-
-    // final json = {
-    //   'name': name,
-    //   'age': '21',
-    //   'birthday': DateTime(2001, 6, 30),
-    // };
-
-    await docUser.set(json);
-  }
+  Stream<List<User>> readUsers() => FirebaseFirestore.instance
+      .collection('users')
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => User.fromJson(doc.data())).toList());
 }

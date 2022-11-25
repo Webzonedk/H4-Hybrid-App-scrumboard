@@ -1,3 +1,5 @@
+import 'package:box/firestore.dart';
+import 'package:date_field/date_field.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,30 +7,30 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../main.dart';
 import '../models/models.dart';
+import 'screens.dart';
+import 'package:flutter/src/rendering/box.dart';
 import '../widgets/widgets.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class GetUserScreen extends StatelessWidget {
+  const GetUserScreen({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final controller = TextEditingController();
   @override
   Widget build(BuildContext context) => Scaffold(
         drawer: const NavigationDrawer(),
         appBar: AppBar(
           //title: TextField(controller: controller),
-          title: const Text('Login'),
+          title: const Text('Get single user'),
 
           actions: [
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
-                final name = controller.text;
-                createUser(name: name);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => const CreateUserSreen(),
+                  ),
+                );
+                //readUsers(name: name);
               },
             ),
           ],
@@ -56,27 +58,44 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
+
+          //FutureBuilder to read from database
+          child: FutureBuilder<User?>(
+            future: readUser(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text('Something went wrong! ${snapshot.error}');
+              } else if (snapshot.hasData) {
+                final user = snapshot.data;
+
+                return user == null
+                    ? const Center(child: Text('User was not found!'))
+                    : buildUser(user);
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
         ),
       );
 
-  Future createUser({required String name}) async {
-    // reference to firebase document
-    final docUser = FirebaseFirestore.instance.collection('users').doc();
+  Widget buildUser(User user) => ListTile(
+        textColor: const Color.fromARGB(255, 255, 255, 255),
+        leading: CircleAvatar(
+          child: Text('${user.age}'),
+        ),
+        title: Text(user.name),
+        subtitle: Text(user.birthDate!.toIso8601String()),
+      );
 
-    final user = User(
-      id: docUser.id,
-      name: name,
-      age: 21,
-      birthDate: DateTime(2000, 9, 14),
-    );
-    final json = user.toJson();
+  Future<User?> readUser() async {
+    final docUser = FirebaseFirestore.instance
+        .collection('users')
+        .doc('hhm3kcPdeHpTuQLRBSZC');
+    final snapshot = await docUser.get();
 
-    // final json = {
-    //   'name': name,
-    //   'age': '21',
-    //   'birthday': DateTime(2001, 6, 30),
-    // };
-
-    await docUser.set(json);
+    if (snapshot.exists) {
+      return User.fromJson(snapshot.data()!);
+    }
   }
 }

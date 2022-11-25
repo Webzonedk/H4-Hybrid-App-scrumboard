@@ -1,4 +1,6 @@
 //Object class to use for Json conversion of inputs
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class User {
   String id;
   final String name;
@@ -18,4 +20,11 @@ class User {
         'age': age,
         'birthDate': birthDate,
       };
+
+  static User fromJson(Map<String, dynamic> json) => User(
+        id: json['id'],
+        name: json['name'],
+        age: json['age'],
+        birthDate: (json['birthDate'] as Timestamp).toDate(),
+      );
 }
