@@ -96,9 +96,14 @@ class BoardScreen extends StatelessWidget {
         onTapItem:
             (int? listIndex, int? itemIndex, BoardItemState? state) async {},
         item: Card(
+          color: const Color.fromARGB(255, 142, 5, 194),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(itemObject.title),
+            child: Text(
+                style: const TextStyle(
+                  color: Color.fromARGB(255, 255, 255, 255),
+                ),
+                itemObject.title),
           ),
         ));
   }

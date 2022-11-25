@@ -63,6 +63,7 @@ class NavigationDrawer extends StatelessWidget {
   const NavigationDrawer({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) => Drawer(
+        backgroundColor: const Color.fromARGB(255, 34, 40, 49),
         child: SingleChildScrollView(
             child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -97,6 +98,8 @@ class NavigationDrawer extends StatelessWidget {
         children: [
           ListTile(
             leading: const Icon(Icons.border_all_rounded),
+            textColor: const Color.fromARGB(255, 255, 255, 255),
+            iconColor: const Color.fromARGB(255, 142, 5, 194),
             title: const Text('Board'),
             onTap: () =>
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -105,6 +108,8 @@ class NavigationDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.person_add_alt),
+            textColor: const Color.fromARGB(255, 255, 255, 255),
+            iconColor: const Color.fromARGB(255, 142, 5, 194),
             title: const Text('Add user'),
             onTap: () =>
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -113,6 +118,8 @@ class NavigationDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.login),
+            textColor: const Color.fromARGB(255, 255, 255, 255),
+            iconColor: const Color.fromARGB(255, 142, 5, 194),
             title: const Text('Login'),
             onTap: () =>
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
