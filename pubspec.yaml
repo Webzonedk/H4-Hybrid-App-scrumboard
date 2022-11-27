@@ -54,6 +54,7 @@ dependencies:
   path:
   box:
   boardview:
+  provider:
 
 
 

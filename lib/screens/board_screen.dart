@@ -32,18 +32,53 @@ class BoardScreen extends StatelessWidget {
   }
 
   final List<BoardListObject> _listData = [
-    BoardListObject(title: "test", items: getCards()),
-    BoardListObject(title: "test1", items: getCards())
+    BoardListObject(title: "test", index: 0, items: getCards()),
+    BoardListObject(title: "test1", index: 1, items: getCards())
   ];
 
   //Can be used to animate to different sections of the BoardView
   BoardViewController boardViewController = BoardViewController();
+
+//----------------------------------------------
+//Added to allow editing the text for a new list
+  final controllerTitle = TextEditingController();
+//----------------------------------------------
 
   @override
   Widget build(BuildContext context) => Scaffold(
         drawer: const NavigationDrawer(),
         appBar: AppBar(
           title: const Text('Scrumboard'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Add new list'),
+                  actions: <Widget>[
+                    TextField(
+                      controller: controllerTitle,
+                      decoration: decoration('Choose a title'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                      child: const Text('Cancel'),
+                    ),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     final listObject = BoardListObject(
+                    //       title: title,
+                    //        index: index,
+                    //         items: items)
+                    //   }
+                    //   child: const Text('OK'),
+                    // ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         backgroundColor: Colors.black87,
         body: Container(
@@ -77,13 +112,92 @@ class BoardScreen extends StatelessWidget {
     for (int i = 0; i < _listData.length; i++) {
       _lists.add(_createBoardList(_listData[i]) as BoardList);
     }
+
     return BoardView(
       lists: _lists,
       boardViewController: boardViewController,
     );
   }
 
+//   Widget addList() {
+//     return BoardList(
+//       // onStartDragList: (int? listIndex) {},
+//       // onTapList: (int? listIndex) async {},
+//       // onDropList: (int? listIndex, int? oldListIndex) {
+//       //   //Update our local list data
+//       //   var list = _listData[oldListIndex!];
+//       //   _listData.removeAt(oldListIndex);
+//       //   _listData.insert(listIndex!, list);
+//       // },
+//       headerBackgroundColor: const Color.fromARGB(255, 34, 40, 49),
+//       backgroundColor: const Color.fromARGB(255, 34, 40, 49),
+//       header: [
+//         Expanded(
+//           child: Padding(
+//             padding: const EdgeInsets.all(5),
+//             child: IconButton(
+//               icon: const Icon(Icons.add),
+//               onPressed: () {
+//                 final name = controllerTitle.text;
+//                 <Widget>[
+//                   TextField(
+//                     controller: controllerTitle,
+//                     decoration: const InputDecoration(
+//                       hintText: 'List title',
+//                       enabledBorder: UnderlineInputBorder(
+//                         borderSide: BorderSide(
+//                           color: Color.fromARGB(255, 142, 5, 194),
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                   ElevatedButton(
+//                     child: const Text('Create'),
+//                     onPressed: () {
+//                       final list = BoardListObject(
+//                         title: controllerTitle.text,
+//                         items: <BoardItemObject>[],
+//                       );
+
+// //Posting to FireBase
+//                       //createUser(user);
+//                       // Navigator.pop(context);
+//                     },
+//                   ),
+//                 ];
+
+//                 inputField();
+//                 final boardListObject = BoardListObject(
+//                   title: controllerTitle.text,
+//                   items: <BoardItemObject>[],
+//                 );
+//               },
+//             ),
+//           ),
+//         ),
+//       ],
+//       // items: items,
+//     );
+//   }
+
+  // inputField() {
+  //   TextField(
+  //     controller: controllerTitle,
+  //     decoration: const InputDecoration(
+  //       hintText: 'List title',
+  //       enabledBorder: UnderlineInputBorder(
+  //         borderSide: BorderSide(
+  //           color: Color.fromARGB(255, 142, 5, 194),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+// Creating lists on the board to be used for listing the cards
   Widget _createBoardList(BoardListObject list) {
+    //Crating the lists that already have contnt
+
     List<BoardItem> items = [];
     for (int i = 0; i < list.items.length; i++) {
       items.insert(i, buildBoardItem(list.items[i]) as BoardItem);
@@ -102,21 +216,24 @@ class BoardScreen extends StatelessWidget {
       backgroundColor: const Color.fromARGB(255, 34, 40, 49),
       header: [
         Expanded(
-            child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Text(
-                  list.title,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 255, 255, 255),
-                  ),
-                ))),
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Text(
+              list.title,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 255, 255, 255),
+              ),
+            ),
+          ),
+        ),
       ],
       items: items,
     );
   }
 
+// Creating the cards from the list
   Widget buildBoardItem(BoardItemObject itemObject) {
     return BoardItem(
         onStartDragItem:
@@ -142,4 +259,13 @@ class BoardScreen extends StatelessWidget {
           ),
         ));
   }
+
+  InputDecoration decoration(String label) => InputDecoration(
+      labelText: label,
+      //border: const OutlineInputBorder(),
+      //fillColor: Colors.blue,
+      labelStyle: const TextStyle(color: Color.fromARGB(255, 142, 5, 194)));
+  //floatingLabelStyle:
+  //    const TextStyle(color: Color.fromARGB(255, 142, 5, 194)));
+
 }
