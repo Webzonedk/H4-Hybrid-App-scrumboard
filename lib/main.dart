@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
 import 'models/models.dart';
+import 'providers/providers.dart';
 import 'screens/screens.dart';
 import 'widgets/widgets.dart';
 import 'package:date_field/date_field.dart';
@@ -12,7 +14,14 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  runApp(const MainPage());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => DataProvider()),
+      ],
+      child: MainPage(),
+    ),
+  );
 }
 
 class MainPage extends StatelessWidget {
@@ -41,7 +50,7 @@ class MainPage extends StatelessWidget {
           ),
         ),
       ),
-      home: const Home(),
+      home: BoardScreen(),
     );
   }
 }
