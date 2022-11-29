@@ -6,8 +6,10 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
 import '../main.dart';
 import '../models/models.dart';
+import '../providers/providers.dart';
 import 'screens.dart';
 import 'package:flutter/src/rendering/box.dart';
 import 'package:boardview/board_item.dart';
@@ -18,6 +20,8 @@ import '../widgets/widgets.dart';
 
 class BoardScreen extends StatelessWidget {
   BoardScreen({super.key});
+
+  //DataProvider dataProvider = DataProvider();
 
   static List<BoardItemObject> getCards() {
     const data = [
@@ -31,115 +35,72 @@ class BoardScreen extends StatelessWidget {
     return data.map<BoardItemObject>(BoardItemObject.fromJson).toList();
   }
 
-  final List<BoardListObject> _listData = [
-    BoardListObject(title: "test", items: getCards()),
-    BoardListObject(title: "test1", items: getCards())
-  ];
+  List<BoardListObject> _listData = [];
+
+  // final List<BoardListObject> _listData = [
+  //   BoardListObject(id: "0", title: "test", index: 0, items: getCards()),
+  //   BoardListObject(id: "1", title: "test1", index: 1, items: getCards())
+  // ];
 
   //Can be used to animate to different sections of the BoardView
   BoardViewController boardViewController = BoardViewController();
 
+//----------------------------------------------
+//Added to allow editing the text for a new list
+  final controllerTitle = TextEditingController();
+//----------------------------------------------
+
   @override
-  Widget build(BuildContext context) => Scaffold(
-        drawer: const NavigationDrawer(),
-        appBar: AppBar(
-          title: const Text('Scrumboard'),
-        ),
-        backgroundColor: Colors.black87,
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              // Where the linear gradient begins and ends
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              // Add one stop for each color. Stops should increase from 0 to 1
-              stops: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
-              colors: [
-                // Colors are easy thanks to Flutter's Colors class.
-                Color.fromARGB(175, 82, 5, 123),
-                Color.fromARGB(175, 88, 19, 185),
-                Color.fromARGB(175, 127, 49, 236),
-                Color.fromARGB(175, 89, 35, 251),
-                Color.fromARGB(175, 25, 32, 242),
-                Color.fromARGB(175, 89, 35, 251),
-                Color.fromARGB(175, 127, 49, 236),
-                Color.fromARGB(175, 88, 19, 185),
-                Color.fromARGB(175, 82, 5, 123),
-              ],
-            ),
-          ),
-          child: boarding(context),
-        ),
-      );
-
-  Widget boarding(BuildContext context) {
-    List<BoardList> _lists = [];
-    for (int i = 0; i < _listData.length; i++) {
-      _lists.add(_createBoardList(_listData[i]) as BoardList);
-    }
-    return BoardView(
-      lists: _lists,
-      boardViewController: boardViewController,
-    );
-  }
-
-  Widget _createBoardList(BoardListObject list) {
-    List<BoardItem> items = [];
-    for (int i = 0; i < list.items.length; i++) {
-      items.insert(i, buildBoardItem(list.items[i]) as BoardItem);
-    }
-
-    return BoardList(
-      onStartDragList: (int? listIndex) {},
-      onTapList: (int? listIndex) async {},
-      onDropList: (int? listIndex, int? oldListIndex) {
-        //Update our local list data
-        var list = _listData[oldListIndex!];
-        _listData.removeAt(oldListIndex);
-        _listData.insert(listIndex!, list);
+  Widget build(BuildContext context) {
+    DataProvider dataList = Provider.of<DataProvider>(context, listen: false);
+    return FutureBuilder(
+      future: dataList.getBoardListObjectsFromDB(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          // ignore: avoid_print
+          print("....... data error....");
+          // ignore: avoid_print
+          print(snapshot.error);
+        } else if (snapshot.hasData) {
+          List<BoardListObject> listObjects =
+              snapshot.data as List<BoardListObject>;
+          _listData = listObjects;
+          // ignore: avoid_print
+          print("....... Board screen snapshot has data....");
+          // ignore: avoid_print
+          print(_listData[0].title);
+          return const Board();
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+        // ignore: avoid_print
+        print("....... Board screen testing the list....");
+        // ignore: avoid_print
+        print(_listData);
+        return CircularProgressIndicator();
       },
-      headerBackgroundColor: const Color.fromARGB(255, 34, 40, 49),
-      backgroundColor: const Color.fromARGB(255, 34, 40, 49),
-      header: [
-        Expanded(
-            child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Text(
-                  list.title,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 255, 255, 255),
-                  ),
-                ))),
-      ],
-      items: items,
     );
-  }
 
-  Widget buildBoardItem(BoardItemObject itemObject) {
-    return BoardItem(
-        onStartDragItem:
-            (int? listIndex, int? itemIndex, BoardItemState? state) {},
-        onDropItem: (int? listIndex, int? itemIndex, int? oldListIndex,
-            int? oldItemIndex, BoardItemState? state) {
-          //Used to update our local item data
-          var item = _listData[oldListIndex!].items[oldItemIndex!];
-          _listData[oldListIndex].items.removeAt(oldItemIndex);
-          _listData[listIndex!].items.insert(itemIndex!, item);
-        },
-        onTapItem:
-            (int? listIndex, int? itemIndex, BoardItemState? state) async {},
-        item: Card(
-          color: const Color.fromARGB(255, 142, 5, 194),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-                style: const TextStyle(
-                  color: Color.fromARGB(255, 255, 255, 255),
-                ),
-                itemObject.title),
-          ),
-        ));
+    // InputDecoration decoration(String label) => InputDecoration(
+    //       labelText: label,
+    //       border: const OutlineInputBorder(),
+    //       labelStyle: const TextStyle(
+    //         color: Color.fromARGB(255, 142, 5, 194),
+    //       ),
+    //       floatingLabelStyle: const TextStyle(
+    //         color: Color.fromARGB(255, 142, 5, 194),
+    //       ),
+    //     );
+
+// //Posting to Firebase
+//   Future addToList(BoardListObject list) async {
+//     // reference to firebase document
+//     final docListObject = FirebaseFirestore.instance
+//         .collection('lists')
+//         .doc((_listData.length + 1).toString());
+//     list.id = docListObject.id;
+//     final json = list.toJson();
+//     await docListObject.set(json);
+//   }
   }
 }
