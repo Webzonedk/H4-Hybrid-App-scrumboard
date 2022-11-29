@@ -160,6 +160,7 @@ class _BoardState extends State<Board> {
         ),
       ],
       items: items,
+      footer: addCard(context, list.items.length + 1),
     );
   }
 
@@ -197,6 +198,47 @@ class _BoardState extends State<Board> {
                 color: Color.fromARGB(255, 255, 255, 255),
               ),
               itemObject.title),
+        ),
+      ),
+    );
+  }
+
+  Widget addCard(BuildContext context, int index) {
+    return Container(
+      alignment: Alignment.centerRight,
+      child: IconButton(
+        icon: const Icon(
+          Icons.add,
+          color: Color.fromARGB(255, 142, 5, 194),
+        ),
+        onPressed: () => showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Add new list'),
+            actions: <Widget>[
+              TextField(
+                controller: controllerTitle,
+                decoration: decoration('Choose a title'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  final listObject = BoardListObject(
+                    id: (context.read<DataProvider>().globalDataList.length + 1)
+                        .toString(),
+                    title: controllerTitle.text,
+                    items: <BoardItemObject>[],
+                  );
+                  addToList(context, listObject);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
