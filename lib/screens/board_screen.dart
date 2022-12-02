@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:boardview/boardview_controller.dart';
 
 import 'package:date_field/date_field.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,22 +22,45 @@ import 'package:boardview/boardview_controller.dart';
 import 'package:boardview/boardview.dart';
 import '../widgets/widgets.dart';
 
-class BoardScreen extends StatelessWidget {
-  BoardScreen({super.key});
+class BoardScreen extends StatefulWidget {
+  const BoardScreen({super.key});
 
-  //DataProvider dataProvider = DataProvider();
+  @override
+  State<BoardScreen> createState() => _BoardScreen();
+}
 
-  static List<BoardItemObject> getCards() {
-    const data = [
-      {"title": "test 1"},
-      {"title": "test 2"},
-      {"title": "test 3"},
-      {"title": "test 4"},
-      {"title": "test 5"},
-      {"title": "test 6"},
-    ];
-    return data.map<BoardItemObject>(BoardItemObject.fromJson).toList();
+class _BoardScreen extends State<BoardScreen> {
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //To be used for Push notifications
+  //----------------------------------------------------------
+  String? _token;
+  final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+
+  @override
+  void initState() {
+    super.initState();
+    requestPermission();
+    fetchToken();
+    initInfo();
+    // ignore: avoid_print
+    print("............ READY ..................");
+    //DataProvider dataProvider = DataProvider();
   }
+//--------------------------------------------------------------
+//--------------------------------------------------------------
+
+  //  List<BoardItemObject> getCards() {
+  //   const data = [
+  //     {"title": "test 1"},
+  //     {"title": "test 2"},
+  //     {"title": "test 3"},
+  //     {"title": "test 4"},
+  //     {"title": "test 5"},
+  //     {"title": "test 6"},
+  //   ];
+  //   return data.map<BoardItemObject>(BoardItemObject.fromJson).toList();
+  // }
 
   final List<BoardListObject> _listData = [];
 
@@ -80,4 +107,65 @@ class BoardScreen extends StatelessWidget {
       },
     );
   }
+
+//--------------------------------------------------------------
+//--------------------------------------------------------------
+//Push notifications
+//--------------------------------------------------------------
+  Future<void> requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    switch (settings.authorizationStatus) {
+      case AuthorizationStatus.authorized:
+        // ignore: avoid_print
+        print("....... User granted permission....");
+        break;
+      case AuthorizationStatus.provisional:
+        // ignore: avoid_print
+        print("....... User granted provisional permission....");
+        break;
+      default:
+        // ignore: avoid_print
+        print("....... User denied permission....");
+        break;
+    }
+  }
+
+  Future<void> fetchToken() async {
+    await FirebaseMessaging.instance
+        .getToken()
+        // ignore: avoid_print
+        .then((token) => {_token = token, print("Token: $_token")});
+
+    //save the token to Firebase live database
+    String? modelInfo = Platform.isAndroid
+        ? (await fetchModelInfo() as AndroidDeviceInfo).model
+        : (await fetchModelInfo() as IosDeviceInfo).name;
+
+    FirebaseDatabase.instance
+        .ref("usertokens")
+        .child(modelInfo!)
+        .set({"token": _token});
+  }
+
+  Future<BaseDeviceInfo> fetchModelInfo() async {
+    if (Platform.isAndroid) {
+      return await deviceInfoPlugin.androidInfo;
+    }
+    if (Platform.isIOS) {
+      return await deviceInfoPlugin.iosInfo;
+    }
+    throw Exception("Only Android or IOS is supported!");
+  }
+  //-------------------------------------------------------------
+  //-------------------------------------------------------------
 }

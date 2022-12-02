@@ -19,18 +19,13 @@ import 'package:boardview/boardview.dart';
 import '../widgets/widgets.dart';
 import 'dart:async';
 
-// typedef OnStateChange = VoidCallback;
-//typedef IntOperation<int> = int Function();
+typedef OnUpdateState = void Function(String c);
 
 class Board extends StatefulWidget {
   const Board({super.key});
 
   @override
   State<Board> createState() => _BoardState();
-
-  static void mySetState() {
-    mySetState();
-  }
 }
 
 class _BoardState extends State<Board> {
@@ -39,26 +34,26 @@ class _BoardState extends State<Board> {
   @override
   void initState() {
     super.initState();
-    try {} finally {}
   }
 
-  void mySetState() {
+  void setNewState(String c) {
     // ignore: avoid_print
-    print(
-        "................. mySetState globalDataList length before setstate.................");
-    // // ignore: avoid_print
-    // print(context.read<DataProvider>().globalDataList.length);
+    print("................. setNewState value of c.................");
+    // ignore: avoid_print
+    print(c);
 
     setState(() {});
   }
 
-//  Void updateBoardState() {
-//     if (1 == 2) {
-//       throw const FormatException("woopti");
-//     } else {
-//       setState(() {});
-//     }
-//   }
+  // void mySetState() {
+  //   // ignore: avoid_print
+  //   print(
+  //       "................. mySetState globalDataList length before setstate.................");
+  //   // // ignore: avoid_print
+  //   // print(context.read<DataProvider>().globalDataList.length);
+
+  //   setState(() {});
+  // }
 
 //----------------------------------------------
 //Added to allow editing the text for a new list
@@ -68,8 +63,9 @@ class _BoardState extends State<Board> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        drawer: const NavigationDrawer(), //The drawer wrom Widgets
-        appBar: CustomAppBar(),
+        drawer: const NavigationDrawer(), //The drawer from Widgets
+        appBar:
+            CustomAppBar(updateState: setNewState), //The appBar from widgets
         backgroundColor: Colors.black87,
         body: Container(
           decoration: const BoxDecoration(
@@ -151,7 +147,7 @@ class _BoardState extends State<Board> {
       ],
       items: items,
       //adding a footer to apply cards with a button
-      footer: addCard(context, list.items.length + 1),
+      footer: addNewCard(context, list.items.length + 1),
     );
   }
 
@@ -195,7 +191,7 @@ class _BoardState extends State<Board> {
   }
 
 //The first card called Add new list
-  Widget addCard(BuildContext context, int index) {
+  Widget addNewCard(BuildContext context, int index) {
     return Container(
       alignment: Alignment.centerLeft,
       child: IconButton(

@@ -21,10 +21,15 @@ import '../widgets/widgets.dart';
 import 'dart:async';
 
 class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
-  CustomAppBar({super.key});
+  CustomAppBar({
+    required this.updateState,
+    super.key,
+  });
 
   // String callBackText;
   // VoidCallback updateBoardState;
+
+  final OnUpdateState updateState;
 
   @override
   Size get preferredSize => const Size.fromHeight(50);
@@ -74,12 +79,12 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
                       //Accessing the  callBack function
                       //this.widget.updateBoardState(controllerTitle.text);
                       controllerTitle.clear();
-                      //setState(() {});
-                      // Board.mySetState();
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => BoardScreen()));
 
-                      // Navigator.of(context).pop();
+                      int c = 1;
+                      updateState('test');
+                      Navigator.of(context).pop();
+                      // Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      //     builder: (context) => BoardScreen()));
                     },
                   ),
                 ],

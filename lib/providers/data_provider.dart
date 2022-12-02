@@ -103,7 +103,7 @@ class DataProvider with ChangeNotifier {
     await deleteAllListInFirestore();
     for (var i = 0; i < globalDataList.length; i++) {
       globalDataList[i].id == i.toString();
-      await addToListAfterReorganizing(globalDataList[i]);
+      await addListAfterReorganizing(globalDataList[i]);
       // ignore: avoid_print
       print(
           "................. Data provider ReorganizingGlobalList, globalDataList length.................");
@@ -128,7 +128,7 @@ class DataProvider with ChangeNotifier {
   }
 
   //Posting a new list after reorganizing the globalDataList, to Firebase
-  Future addToListAfterReorganizing(BoardListObject list) async {
+  Future addListAfterReorganizing(BoardListObject list) async {
     // reference to firebase document
     final docListObject =
         FirebaseFirestore.instance.collection('lists').doc(list.id);
@@ -137,7 +137,7 @@ class DataProvider with ChangeNotifier {
     await docListObject.set(json);
     // ignore: avoid_print
     print(
-        "................. Data provider addToListAfterReorganizing, globalDataList length.................");
+        "................. Data provider addListAfterReorganizing, globalDataList length.................");
     // ignore: avoid_print
     print(globalDataList.length);
   }
