@@ -1,5 +1,4 @@
 import 'package:boardview/boardview_controller.dart';
-
 import 'package:date_field/date_field.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -18,6 +17,9 @@ import 'package:boardview/board_list.dart';
 import 'package:boardview/boardview_controller.dart';
 import 'package:boardview/boardview.dart';
 import '../widgets/widgets.dart';
+import 'dart:async';
+
+typedef OnUpdateState = void Function(String c);
 
 class Board extends StatefulWidget {
   const Board({super.key});
@@ -29,57 +31,41 @@ class Board extends StatefulWidget {
 class _BoardState extends State<Board> {
   BoardViewController boardViewController = BoardViewController();
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void setNewState(String c) {
+    // ignore: avoid_print
+    print("................. setNewState value of c.................");
+    // ignore: avoid_print
+    print(c);
+
+    setState(() {});
+  }
+
+  // void mySetState() {
+  //   // ignore: avoid_print
+  //   print(
+  //       "................. mySetState globalDataList length before setstate.................");
+  //   // // ignore: avoid_print
+  //   // print(context.read<DataProvider>().globalDataList.length);
+
+  //   setState(() {});
+  // }
+
 //----------------------------------------------
 //Added to allow editing the text for a new list
+  final controllerListTitle = TextEditingController();
   final controllerTitle = TextEditingController();
 //----------------------------------------------
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        drawer: const NavigationDrawer(),
-        appBar: AppBar(
-          title: const Text('Scrumboard'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: const Text('Add new list'),
-                  actions: <Widget>[
-                    TextField(
-                      controller: controllerTitle,
-                      decoration: decoration('Choose a title'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, 'Cancel'),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      child: const Text('OK'),
-                      onPressed: () {
-                        final listObject = BoardListObject(
-                          id: (context
-                                      .read<DataProvider>()
-                                      .globalDataList
-                                      .length +
-                                  1)
-                              .toString(),
-                          title: controllerTitle.text,
-                          items: <BoardItemObject>[],
-                        );
-                        addToList(context, listObject);
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => BoardScreen()));
-                        //Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+        drawer: const NavigationDrawer(), //The drawer from Widgets
+        appBar:
+            CustomAppBar(updateState: setNewState), //The appBar from widgets
         backgroundColor: Colors.black87,
         body: Container(
           decoration: const BoxDecoration(
@@ -108,15 +94,14 @@ class _BoardState extends State<Board> {
       );
 
   Widget boarding(BuildContext context) {
+    DataProvider dataProvider =
+        Provider.of<DataProvider>(context, listen: false);
     List<BoardList> lists = [];
-    for (int i = 0;
-        i < context.read<DataProvider>().globalDataList.length;
-        i++) {
+    for (int i = 0; i < dataProvider.globalDataList.length; i++) {
       lists.add(_createBoardList(
               context, context.read<DataProvider>().globalDataList[i])
           as BoardList);
     }
-
     return BoardView(
       lists: lists,
       boardViewController: boardViewController,
@@ -125,7 +110,7 @@ class _BoardState extends State<Board> {
 
 // Creating lists on the board to be used for listing the cards
   Widget _createBoardList(BuildContext context, BoardListObject list) {
-    //Crating the lists that already have contnt
+    //Crating the lists that already have content
 
     List<BoardItem> items = [];
     if (list.items.isNotEmpty) {}
@@ -158,8 +143,11 @@ class _BoardState extends State<Board> {
             ),
           ),
         ),
+        deleteList(context, list.id),
       ],
       items: items,
+      //adding a footer to apply cards with a button
+      footer: addNewCard(context, list.items.length + 1),
     );
   }
 
@@ -197,6 +185,114 @@ class _BoardState extends State<Board> {
                 color: Color.fromARGB(255, 255, 255, 255),
               ),
               itemObject.title),
+        ),
+      ),
+    );
+  }
+
+//The first card called Add new list
+  Widget addNewCard(BuildContext context, int index) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      child: IconButton(
+        icon: const Icon(
+          Icons.add,
+          color: Color.fromARGB(255, 142, 5, 194),
+        ),
+        onPressed: () => showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Add new Card'),
+            actions: <Widget>[
+              TextField(
+                controller: controllerTitle,
+                decoration: decoration('Choose a title'),
+              ),
+              TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    controllerTitle.clear();
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  }),
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  final listObject = BoardListObject(
+                    id: (context.read<DataProvider>().globalDataList.length + 1)
+                        .toString(),
+                    title: controllerTitle.text,
+                    items: <BoardItemObject>[],
+                  );
+                  context.read<DataProvider>().addToList(context, listObject);
+                  setState(() {});
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+//Widget with a dialogbox to delete a single list and all of its cards
+  Widget deleteList(BuildContext context, String index) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      child: IconButton(
+        icon: const Icon(
+          Icons.delete_forever_outlined,
+          color: Color.fromARGB(255, 142, 5, 194),
+        ),
+        onPressed: () => showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Delete list?'),
+            content: const Text(
+                'If there is card in the list, they will all be deleted. Please make sure that the list is empty before proceeding'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'Cancel'),
+                child: const Text('Cancel'),
+              ),
+              const SizedBox(height: 30),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: <Color>[
+                              Color.fromARGB(174, 106, 0, 255),
+                              Color.fromARGB(172, 144, 64, 255),
+                              Color.fromARGB(174, 175, 118, 255),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.all(16.0),
+                        textStyle: const TextStyle(fontSize: 20),
+                      ),
+                      child: const Text('Delete'),
+                      onPressed: () {
+                        context.read<DataProvider>().deleteList(index);
+
+                        setState(() {});
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

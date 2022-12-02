@@ -31,7 +31,7 @@ class NavigationDrawer extends StatelessWidget {
         decoration: const BoxDecoration(
           color: Color.fromARGB(255, 142, 5, 194),
         ),
-        height: 100,
+        height: 77,
         alignment: Alignment.bottomLeft,
         child: const Text(
           'Welcome',

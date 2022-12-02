@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:boardview/boardview_controller.dart';
 
 import 'package:date_field/date_field.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,29 +22,47 @@ import 'package:boardview/boardview_controller.dart';
 import 'package:boardview/boardview.dart';
 import '../widgets/widgets.dart';
 
-class BoardScreen extends StatelessWidget {
-  BoardScreen({super.key});
+class BoardScreen extends StatefulWidget {
+  const BoardScreen({super.key});
 
-  //DataProvider dataProvider = DataProvider();
+  @override
+  State<BoardScreen> createState() => _BoardScreen();
+}
 
-  static List<BoardItemObject> getCards() {
-    const data = [
-      {"title": "test 1"},
-      {"title": "test 2"},
-      {"title": "test 3"},
-      {"title": "test 4"},
-      {"title": "test 5"},
-      {"title": "test 6"},
-    ];
-    return data.map<BoardItemObject>(BoardItemObject.fromJson).toList();
+class _BoardScreen extends State<BoardScreen> {
+  //----------------------------------------------------------
+  //----------------------------------------------------------
+  //To be used for Push notifications
+  //----------------------------------------------------------
+  String? _token;
+  final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+
+  @override
+  void initState() {
+    super.initState();
+    requestPermission();
+    fetchToken();
+    initInfo();
+    // ignore: avoid_print
+    print("............ READY ..................");
+    //DataProvider dataProvider = DataProvider();
   }
+//--------------------------------------------------------------
+//--------------------------------------------------------------
 
-  List<BoardListObject> _listData = [];
+  //  List<BoardItemObject> getCards() {
+  //   const data = [
+  //     {"title": "test 1"},
+  //     {"title": "test 2"},
+  //     {"title": "test 3"},
+  //     {"title": "test 4"},
+  //     {"title": "test 5"},
+  //     {"title": "test 6"},
+  //   ];
+  //   return data.map<BoardItemObject>(BoardItemObject.fromJson).toList();
+  // }
 
-  // final List<BoardListObject> _listData = [
-  //   BoardListObject(id: "0", title: "test", index: 0, items: getCards()),
-  //   BoardListObject(id: "1", title: "test1", index: 1, items: getCards())
-  // ];
+  final List<BoardListObject> _listData = [];
 
   //Can be used to animate to different sections of the BoardView
   BoardViewController boardViewController = BoardViewController();
@@ -52,55 +74,98 @@ class BoardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DataProvider dataList = Provider.of<DataProvider>(context, listen: false);
+    // DataProvider dataProvider =
+    //     Provider.of<DataProvider>(context, listen: false);
+    //Could be a streambuilder to live update
     return FutureBuilder(
-      future: dataList.getBoardListObjectsFromDB(),
+      future: context.read<DataProvider>().getBoardListObjectsFromDB(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          // ignore: avoid_print
-          print("....... data error....");
-          // ignore: avoid_print
-          print(snapshot.error);
-        } else if (snapshot.hasData) {
-          List<BoardListObject> listObjects =
-              snapshot.data as List<BoardListObject>;
-          _listData = listObjects;
-          // ignore: avoid_print
-          print("....... Board screen snapshot has data....");
-          // ignore: avoid_print
-          print(_listData[0].title);
-          return const Board();
+        if (context.read<DataProvider>().globalDataList.isEmpty) {
+          // // ignore: avoid_print
+          // print("....... Board screen globalDataList is empty.......");
+          // // ignore: avoid_print
+          // print(snapshot.error);
+          context.read<DataProvider>().initializeEmptyDB(
+              context.read<DataProvider>().initializingListObject);
+          return const Center(child: CircularProgressIndicator());
+        } else if (context.read<DataProvider>().globalDataList.isNotEmpty) {
+          // // ignore: avoid_print
+          // print("....... Board screen globalDataList has data....");
+          // // ignore: avoid_print
+          // print(context.read<DataProvider>().globalDataList[0].title);
+
+          return const Board(); //Returning the board Widget
         } else {
           return const Center(child: CircularProgressIndicator());
         }
-        // ignore: avoid_print
-        print("....... Board screen testing the list....");
-        // ignore: avoid_print
-        print(_listData);
-        return CircularProgressIndicator();
+
+        // // ignore: avoid_print
+        // print("....... Board screen no error and no data. Just loading......");
+        // // ignore: avoid_print
+        // print(context.read<DataProvider>().globalDataList[0].title);
+        // return const Center(child: CircularProgressIndicator());
       },
     );
-
-    // InputDecoration decoration(String label) => InputDecoration(
-    //       labelText: label,
-    //       border: const OutlineInputBorder(),
-    //       labelStyle: const TextStyle(
-    //         color: Color.fromARGB(255, 142, 5, 194),
-    //       ),
-    //       floatingLabelStyle: const TextStyle(
-    //         color: Color.fromARGB(255, 142, 5, 194),
-    //       ),
-    //     );
-
-// //Posting to Firebase
-//   Future addToList(BoardListObject list) async {
-//     // reference to firebase document
-//     final docListObject = FirebaseFirestore.instance
-//         .collection('lists')
-//         .doc((_listData.length + 1).toString());
-//     list.id = docListObject.id;
-//     final json = list.toJson();
-//     await docListObject.set(json);
-//   }
   }
+
+//--------------------------------------------------------------
+//--------------------------------------------------------------
+//Push notifications
+//--------------------------------------------------------------
+  Future<void> requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    switch (settings.authorizationStatus) {
+      case AuthorizationStatus.authorized:
+        // ignore: avoid_print
+        print("....... User granted permission....");
+        break;
+      case AuthorizationStatus.provisional:
+        // ignore: avoid_print
+        print("....... User granted provisional permission....");
+        break;
+      default:
+        // ignore: avoid_print
+        print("....... User denied permission....");
+        break;
+    }
+  }
+
+  Future<void> fetchToken() async {
+    await FirebaseMessaging.instance
+        .getToken()
+        // ignore: avoid_print
+        .then((token) => {_token = token, print("Token: $_token")});
+
+    //save the token to Firebase live database
+    String? modelInfo = Platform.isAndroid
+        ? (await fetchModelInfo() as AndroidDeviceInfo).model
+        : (await fetchModelInfo() as IosDeviceInfo).name;
+
+    FirebaseDatabase.instance
+        .ref("usertokens")
+        .child(modelInfo!)
+        .set({"token": _token});
+  }
+
+  Future<BaseDeviceInfo> fetchModelInfo() async {
+    if (Platform.isAndroid) {
+      return await deviceInfoPlugin.androidInfo;
+    }
+    if (Platform.isIOS) {
+      return await deviceInfoPlugin.iosInfo;
+    }
+    throw Exception("Only Android or IOS is supported!");
+  }
+  //-------------------------------------------------------------
+  //-------------------------------------------------------------
 }
