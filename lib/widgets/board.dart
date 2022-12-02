@@ -19,31 +19,34 @@ import 'package:boardview/boardview.dart';
 import '../widgets/widgets.dart';
 import 'dart:async';
 
-typedef OnUpdateState = void Function(String c);
-
 class Board extends StatefulWidget {
-  const Board({super.key});
+  Board({required this.updateBoardState, super.key});
+  OnUpdateStateOnBoard updateBoardState;
 
   @override
   State<Board> createState() => _BoardState();
 }
 
 class _BoardState extends State<Board> {
-  BoardViewController boardViewController = BoardViewController();
+  final boardViewController = BoardViewController();
 
   @override
   void initState() {
     super.initState();
+    update();
   }
 
-  void setNewState(String c) {
-    // ignore: avoid_print
-    print("................. setNewState value of c.................");
-    // ignore: avoid_print
-    print(c);
-
-    setState(() {});
+  void update() {
+    widget.updateBoardState();
   }
+
+  // Future<void> setNewState(String c) async {
+  //   // ignore: avoid_print
+  //   print("................. setNewState value of c.................");
+  //   // ignore: avoid_print
+  //   print(c);
+  //   setState(() {});
+  // }
 
   // void mySetState() {
   //   // ignore: avoid_print
@@ -62,36 +65,11 @@ class _BoardState extends State<Board> {
 //----------------------------------------------
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        drawer: const NavigationDrawer(), //The drawer from Widgets
-        appBar:
-            CustomAppBar(updateState: setNewState), //The appBar from widgets
-        backgroundColor: Colors.black87,
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              // Where the linear gradient begins and ends
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              // Add one stop for each color. Stops should increase from 0 to 1
-              stops: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
-              colors: [
-                // Colors are easy thanks to Flutter's Colors class.
-                Color.fromARGB(175, 82, 5, 123),
-                Color.fromARGB(175, 88, 19, 185),
-                Color.fromARGB(175, 127, 49, 236),
-                Color.fromARGB(175, 89, 35, 251),
-                Color.fromARGB(175, 25, 32, 242),
-                Color.fromARGB(175, 89, 35, 251),
-                Color.fromARGB(175, 127, 49, 236),
-                Color.fromARGB(175, 88, 19, 185),
-                Color.fromARGB(175, 82, 5, 123),
-              ],
-            ),
-          ),
-          child: boarding(context),
-        ),
-      );
+  Widget build(BuildContext context) {
+    return Container(
+      child: boarding(context),
+    );
+  }
 
   Widget boarding(BuildContext context) {
     DataProvider dataProvider =

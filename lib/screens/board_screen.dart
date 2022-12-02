@@ -21,6 +21,10 @@ import 'package:boardview/board_list.dart';
 import 'package:boardview/boardview_controller.dart';
 import 'package:boardview/boardview.dart';
 import '../widgets/widgets.dart';
+import 'dart:async';
+
+typedef OnUpdateState = void Function(String c);
+typedef OnUpdateStateOnBoard = void Function();
 
 class BoardScreen extends StatefulWidget {
   const BoardScreen({super.key});
@@ -30,6 +34,7 @@ class BoardScreen extends StatefulWidget {
 }
 
 class _BoardScreen extends State<BoardScreen> {
+  BoardViewController boardViewController = BoardViewController();
   //----------------------------------------------------------
   //----------------------------------------------------------
   //To be used for Push notifications
@@ -50,6 +55,22 @@ class _BoardScreen extends State<BoardScreen> {
 //--------------------------------------------------------------
 //--------------------------------------------------------------
 
+  Future<void> setNewState(String c) async {
+    // ignore: avoid_print
+    print("................. setNewState value of c.................");
+    // ignore: avoid_print
+    print(c);
+    setState(() {});
+  }
+
+  Future<void> setNewStateBoard() async {
+    // ignore: avoid_print
+    print("................. setNewState value of d.................");
+    // ignore: avoid_print
+    print('test');
+    setState(() {});
+  }
+
   //  List<BoardItemObject> getCards() {
   //   const data = [
   //     {"title": "test 1"},
@@ -64,49 +85,62 @@ class _BoardScreen extends State<BoardScreen> {
 
   final List<BoardListObject> _listData = [];
 
-  //Can be used to animate to different sections of the BoardView
-  BoardViewController boardViewController = BoardViewController();
-
 //----------------------------------------------
 //Added to allow editing the text for a new list
   final controllerTitle = TextEditingController();
 //----------------------------------------------
 
   @override
-  Widget build(BuildContext context) {
-    // DataProvider dataProvider =
-    //     Provider.of<DataProvider>(context, listen: false);
-    //Could be a streambuilder to live update
-    return FutureBuilder(
-      future: context.read<DataProvider>().getBoardListObjectsFromDB(),
-      builder: (context, snapshot) {
-        if (context.read<DataProvider>().globalDataList.isEmpty) {
-          // // ignore: avoid_print
-          // print("....... Board screen globalDataList is empty.......");
-          // // ignore: avoid_print
-          // print(snapshot.error);
-          context.read<DataProvider>().initializeEmptyDB(
-              context.read<DataProvider>().initializingListObject);
-          return const Center(child: CircularProgressIndicator());
-        } else if (context.read<DataProvider>().globalDataList.isNotEmpty) {
-          // // ignore: avoid_print
-          // print("....... Board screen globalDataList has data....");
-          // // ignore: avoid_print
-          // print(context.read<DataProvider>().globalDataList[0].title);
-
-          return const Board(); //Returning the board Widget
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        // // ignore: avoid_print
-        // print("....... Board screen no error and no data. Just loading......");
-        // // ignore: avoid_print
-        // print(context.read<DataProvider>().globalDataList[0].title);
-        // return const Center(child: CircularProgressIndicator());
-      },
-    );
-  }
+  Widget build(BuildContext context) => Scaffold(
+        drawer: const NavigationDrawer(),
+        appBar:
+            CustomAppBar(updateState: setNewState), //The appBar from widgets
+        // DataProvider dataProvider =
+        //     Provider.of<DataProvider>(context, listen: false);
+        //Could be a streambuilder to live update
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              // Where the linear gradient begins and ends
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              // Add one stop for each color. Stops should increase from 0 to 1
+              stops: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+              colors: [
+                // Colors are easy thanks to Flutter's Colors class.
+                Color.fromARGB(175, 82, 5, 123),
+                Color.fromARGB(175, 88, 19, 185),
+                Color.fromARGB(175, 127, 49, 236),
+                Color.fromARGB(175, 89, 35, 251),
+                Color.fromARGB(175, 25, 32, 242),
+                Color.fromARGB(175, 89, 35, 251),
+                Color.fromARGB(175, 127, 49, 236),
+                Color.fromARGB(175, 88, 19, 185),
+                Color.fromARGB(175, 82, 5, 123),
+              ],
+            ),
+          ),
+          child: FutureBuilder(
+            future: context.read<DataProvider>().getBoardListObjectsFromDB(),
+            builder: (context, snapshot) {
+              if (context.read<DataProvider>().globalDataList.isEmpty) {
+                context.read<DataProvider>().initializeEmptyDB(
+                    context.read<DataProvider>().initializingListObject);
+                return const Center(child: CircularProgressIndicator());
+              } else if (context
+                  .read<DataProvider>()
+                  .globalDataList
+                  .isNotEmpty) {
+                return Board(
+                    updateBoardState:
+                        setNewStateBoard); //Returning the board Widget
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        ),
+      );
 
 //--------------------------------------------------------------
 //--------------------------------------------------------------
