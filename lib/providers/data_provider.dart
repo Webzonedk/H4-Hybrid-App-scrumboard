@@ -34,13 +34,6 @@ class DataProvider with ChangeNotifier {
     getBoardListObjectsFromDB();
   }
 
-  // Stream<List<BoardListObject>> getBoardListObjectsFromDB1() =>
-  //     FirebaseFirestore.instance.collection('lists').snapshots().map(
-  //           (snapshot) => snapshot.docs
-  //               .map((doc) => BoardListObject.fromJson(doc.data()))
-  //               .toList(),
-  //         );
-
   Future<List<BoardListObject>> getBoardListObjectsFromDB() async {
     QuerySnapshot snapshot =
         await FirebaseFirestore.instance.collection('lists').get();

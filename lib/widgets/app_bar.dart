@@ -26,9 +26,6 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
     super.key,
   });
 
-  // String callBackText;
-  // VoidCallback updateBoardState;
-
   final OnUpdateState updateState;
 
   @override
@@ -80,7 +77,7 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
                       //this.widget.updateBoardState(controllerTitle.text);
                       controllerTitle.clear();
 
-                      int c = 1;
+                      // int c = 1;
                       updateState('test');
                       Navigator.of(context).pop();
                       // Navigator.of(context).pushReplacement(MaterialPageRoute(
