@@ -83,7 +83,7 @@ class _BoardScreen extends State<BoardScreen> {
   //   return data.map<BoardItemObject>(BoardItemObject.fromJson).toList();
   // }
 
-  final List<BoardListObject> _listData = [];
+  // final List<BoardListObject> _listData = [];
 
 //----------------------------------------------
 //Added to allow editing the text for a new list
@@ -98,6 +98,7 @@ class _BoardScreen extends State<BoardScreen> {
         // DataProvider dataProvider =
         //     Provider.of<DataProvider>(context, listen: false);
         //Could be a streambuilder to live update
+        backgroundColor: Colors.black87,
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(

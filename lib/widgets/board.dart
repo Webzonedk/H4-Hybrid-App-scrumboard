@@ -40,24 +40,6 @@ class _BoardState extends State<Board> {
     widget.updateBoardState();
   }
 
-  // Future<void> setNewState(String c) async {
-  //   // ignore: avoid_print
-  //   print("................. setNewState value of c.................");
-  //   // ignore: avoid_print
-  //   print(c);
-  //   setState(() {});
-  // }
-
-  // void mySetState() {
-  //   // ignore: avoid_print
-  //   print(
-  //       "................. mySetState globalDataList length before setstate.................");
-  //   // // ignore: avoid_print
-  //   // print(context.read<DataProvider>().globalDataList.length);
-
-  //   setState(() {});
-  // }
-
 //----------------------------------------------
 //Added to allow editing the text for a new list
   final controllerListTitle = TextEditingController();
