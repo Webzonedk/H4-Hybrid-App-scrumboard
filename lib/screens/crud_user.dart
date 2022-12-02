@@ -76,15 +76,15 @@ class CrudUserScreen extends StatelessWidget {
                       .doc('my-id');
 
                   //Update the specific field in database
-                  // docUser.update({
-                  //   'name': 'Emma',
-                  //   //'city.name': 'San Francisco', //For nested fields
-                  //   //'city.name': FieldValue.delete(), //To delete a field and its value
-                  // });
-                  //To replace all field in document use the following
-                  docUser.set({
-                    'name': 'James',
+                  docUser.update({
+                    'name': 'Emma',
+                    //'city.name': 'San Francisco', //For nested fields
+                    //'city.name': FieldValue.delete(), //To delete a field and its value
                   });
+                  // //To replace all field in document use the following
+                  // docUser.set({
+                  //   'name': 'James',
+                  //});
                 },
               ),
               const SizedBox(height: 32),

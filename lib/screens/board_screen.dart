@@ -35,12 +35,7 @@ class BoardScreen extends StatelessWidget {
     return data.map<BoardItemObject>(BoardItemObject.fromJson).toList();
   }
 
-  List<BoardListObject> _listData = [];
-
-  // final List<BoardListObject> _listData = [
-  //   BoardListObject(id: "0", title: "test", index: 0, items: getCards()),
-  //   BoardListObject(id: "1", title: "test1", index: 1, items: getCards())
-  // ];
+  final List<BoardListObject> _listData = [];
 
   //Can be used to animate to different sections of the BoardView
   BoardViewController boardViewController = BoardViewController();
@@ -52,55 +47,37 @@ class BoardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DataProvider dataList = Provider.of<DataProvider>(context, listen: false);
+    // DataProvider dataProvider =
+    //     Provider.of<DataProvider>(context, listen: false);
+    //Could be a streambuilder to live update
     return FutureBuilder(
-      future: dataList.getBoardListObjectsFromDB(),
+      future: context.read<DataProvider>().getBoardListObjectsFromDB(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          // ignore: avoid_print
-          print("....... data error....");
-          // ignore: avoid_print
-          print(snapshot.error);
-        } else if (snapshot.hasData) {
-          List<BoardListObject> listObjects =
-              snapshot.data as List<BoardListObject>;
-          _listData = listObjects;
-          // ignore: avoid_print
-          print("....... Board screen snapshot has data....");
-          // ignore: avoid_print
-          print(_listData[0].title);
-          return const Board();
+        if (context.read<DataProvider>().globalDataList.isEmpty) {
+          // // ignore: avoid_print
+          // print("....... Board screen globalDataList is empty.......");
+          // // ignore: avoid_print
+          // print(snapshot.error);
+          context.read<DataProvider>().initializeEmptyDB(
+              context.read<DataProvider>().initializingListObject);
+          return const Center(child: CircularProgressIndicator());
+        } else if (context.read<DataProvider>().globalDataList.isNotEmpty) {
+          // // ignore: avoid_print
+          // print("....... Board screen globalDataList has data....");
+          // // ignore: avoid_print
+          // print(context.read<DataProvider>().globalDataList[0].title);
+
+          return const Board(); //Returning the board Widget
         } else {
           return const Center(child: CircularProgressIndicator());
         }
-        // ignore: avoid_print
-        print("....... Board screen testing the list....");
-        // ignore: avoid_print
-        print(_listData);
-        return CircularProgressIndicator();
+
+        // // ignore: avoid_print
+        // print("....... Board screen no error and no data. Just loading......");
+        // // ignore: avoid_print
+        // print(context.read<DataProvider>().globalDataList[0].title);
+        // return const Center(child: CircularProgressIndicator());
       },
     );
-
-    // InputDecoration decoration(String label) => InputDecoration(
-    //       labelText: label,
-    //       border: const OutlineInputBorder(),
-    //       labelStyle: const TextStyle(
-    //         color: Color.fromARGB(255, 142, 5, 194),
-    //       ),
-    //       floatingLabelStyle: const TextStyle(
-    //         color: Color.fromARGB(255, 142, 5, 194),
-    //       ),
-    //     );
-
-// //Posting to Firebase
-//   Future addToList(BoardListObject list) async {
-//     // reference to firebase document
-//     final docListObject = FirebaseFirestore.instance
-//         .collection('lists')
-//         .doc((_listData.length + 1).toString());
-//     list.id = docListObject.id;
-//     final json = list.toJson();
-//     await docListObject.set(json);
-//   }
   }
 }

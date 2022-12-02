@@ -8,6 +8,7 @@ import 'providers/providers.dart';
 import 'screens/screens.dart';
 import 'widgets/widgets.dart';
 import 'package:date_field/date_field.dart';
+import 'dart:async';
 
 Future main() async {
   //Remember future if included methods needs to be run first
@@ -55,15 +56,15 @@ class MainPage extends StatelessWidget {
   }
 }
 
-class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Scrumboard'),
-          backgroundColor: const Color.fromARGB(255, 142, 5, 194),
-        ),
-        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-        drawer: const NavigationDrawer(),
-      );
-}
+// class Home extends StatelessWidget {
+//   const Home({Key? key}) : super(key: key);
+//   @override
+//   Widget build(BuildContext context) => Scaffold(
+//         appBar: AppBar(
+//           title: const Text('Scrumboard'),
+//           backgroundColor: const Color.fromARGB(255, 142, 5, 194),
+//         ),
+//         backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+//         drawer: const NavigationDrawer(),
+//       );
+// }
