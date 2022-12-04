@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 class DataProvider with ChangeNotifier {
   //final FirebaseFirestore _dbReference = FirebaseFirestore.instance.collection('lists');
 
-  late List<BoardListObject> globalDataList = [];
+  List<BoardListObject> globalDataList = [];
   //List<BoardListObject> get globalDataList => localDataList;
   //List<BoardListObject> set globalDataList => localDataList;
 
@@ -34,6 +34,7 @@ class DataProvider with ChangeNotifier {
     getBoardListObjectsFromDB();
   }
 
+//Getting the list from Firebase
   Future<List<BoardListObject>> getBoardListObjectsFromDB() async {
     QuerySnapshot snapshot =
         await FirebaseFirestore.instance.collection('lists').get();
@@ -70,38 +71,61 @@ class DataProvider with ChangeNotifier {
 
 //Deletes a specific list with the document neama applied
   Future deleteList(String index) async {
-    // final docList = FirebaseFirestore.instance.collection('lists').doc(index);
-    // docList.delete();
-    // ignore: avoid_print
-    print("................. Data provider DeleteList, index.................");
-    // ignore: avoid_print
-    print(index);
-    // ignore: avoid_print
-    print(
-        "................. Data provider DeleteList, globalDataList length before remove.................");
-    // ignore: avoid_print
-    print(globalDataList.length);
+    // // ignore: avoid_print
+    // print("................. Data provider DeleteList, index.................");
+    // // ignore: avoid_print
+    // print(index);
+    // // ignore: avoid_print
+    // print(
+    //     "................. Data provider DeleteList, globalDataList length before remove.................");
+    // // ignore: avoid_print
+    // print(globalDataList.length);
 
     globalDataList.removeWhere((item) => item.id == index);
-    // ignore: avoid_print
-    print(
-        "................. Data provider DeleteList, globalDataList length after remove.................");
-    // ignore: avoid_print
-    print(globalDataList.length);
+    // // ignore: avoid_print
+    // print(
+    //     "................. Data provider DeleteList, globalDataList length after remove.................");
+    // for (int i = 0; i < globalDataList.length; i++) {
+    //   // ignore: avoid_print
+    //   print(globalDataList[i].id);
+    // }
     await reorganizeGlobalListAndFirestore();
   }
 
 //Reorganizing the GlobalDatalist so objects id = index
   Future reorganizeGlobalListAndFirestore() async {
     await deleteAllListInFirestore();
-    for (var i = 0; i < globalDataList.length; i++) {
-      globalDataList[i].id == i.toString();
+    for (int i = 0; i < globalDataList.length; i++) {
+      //String index = i.toString();
+      globalDataList[i].id = i.toString();
+
       await addListAfterReorganizing(globalDataList[i]);
-      // ignore: avoid_print
-      print(
-          "................. Data provider ReorganizingGlobalList, globalDataList length.................");
-      // ignore: avoid_print
-      print(globalDataList.length);
+      //   // ignore: avoid_print
+      //   print(
+      //       "................. Data provider ReorganizingGlobalList, globalDataList length.................");
+      //   // ignore: avoid_print
+      //   print(globalDataList.length);
+      // }
+      // // ignore: avoid_print
+      // print(
+      //     "................. Data provider ReorganizingGlobalList, after reorganizing list Printing i.................");
+      // for (int i = 0; i < globalDataList.length; i++) {
+      //   // ignore: avoid_print
+      //   print(i.toString());
+      // }
+      // // ignore: avoid_print
+      // print(
+      //     "................. Data provider ReorganizingGlobalList, after reorganizing list Printing indexnumbers.................");
+      // for (int i = 0; i < globalDataList.length; i++) {
+      //   // ignore: avoid_print
+      //   print(globalDataList.indexOf(globalDataList[i]));
+      // }
+      // // ignore: avoid_print
+      // print(
+      //     "................. Data provider ReorganizingGlobalList, after reorganizing list Printing id.................");
+      // for (int i = 0; i < globalDataList.length; i++) {
+      //   // ignore: avoid_print
+      //   print(globalDataList[i].id);
     }
   }
 
@@ -132,6 +156,8 @@ class DataProvider with ChangeNotifier {
     print(
         "................. Data provider addListAfterReorganizing, globalDataList length.................");
     // ignore: avoid_print
-    print(globalDataList.length);
+    print(json);
   }
+
+  Future editList(BoardListObject list) async {}
 }
